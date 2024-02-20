@@ -2,4 +2,4 @@
 
 ## WipeID
 
-[readme](.\WeapID\readme.md)
+[readme](WeapID#readme)
