@@ -1,13 +1,5 @@
 ﻿# WipeID
 
-> author:  bopin
->
-> date: 2024-1
->
-> description:   WipeID加密算法设计文档
->
-> ps:
->
 > 基于流密码设计，密钥流的随机性参考 RC*算法;   
 >
 > 加密方式基于原先RC4单纯的异或 代数加法运算更改为 乘法运算。
@@ -69,87 +61,61 @@ using (WipeID wi = new WipeID())
 
 ### 密钥流生成器
 
-```c
-void rc4_init(unsigned char* s, unsigned char* key, unsigned long Len) //初始化函数
-{
-	int i = 0, j = 0;
-	char k[256] = { 0 };
-	unsigned char tmp = 0;
-	for (i = 0; i < 256; i++)
-	{
-		/// S-box 初始化为 0-255的自然数  升序排列
-		s[i] = i;
-
-		/// t-box  当key 大于256时, 是无用的。因为key密钥是输入参数，t-box是随机的
-
-		k[i] = key[i % Len]; // t-box使用key来进行填充的
-	}
-	/// 这里只是控制 S-box 密钥流的随机性
-	for (i = 0; i < 256; i++)
-	{
-		/// 引入一个j变量   和 S-box  t-box  j   相加 mod 256
-
-		j = (j + s[i] + k[i]) % 256; // j = 取一个s[i]+k[i]+j的索引
-		//交换s[i]和s[j]
-		/// 
-		tmp = s[i];
-		s[i] = s[j];
-		s[j] = tmp;
-	}
-	printf("");
-}
-
-```
+> 密钥流生成参考 RC*算法
+>
+> 扩充了密钥流范围 > 256
 
 ### 加解密算法
 
-> 假设待加密的明文是:   WVsJv4b
+> **简单说明文以 WORD  2字节（即一个字）进行处理**
+
+> 明文记作： P
 >
-> 共7个字节     偶数
+> 密文记作： C
 >
-> 明文记作:   p
+> 一个加密单元（一个字）的两个字节记作：   L,R  (left,right)           
 
-```c
-																		 6		mod 255
-// 伪代码
-p[0] * p[1]
-    ushort值	 p[1]
-    
-p[2] * p[3]
-    ushort值	 p[1]  ushort值2	 p[3]
-    
-p[4] * p[5]
-    ushort值	 p[1]  ushort值2	 p[3]   ushort值3   p[5]		  此时密文序列共计9个字节
-                                                                             		mod 65535
-
-	
-    4
-ushort * ushort  ushort * ushort  ushort * ushort  ushort * ushort  1   
-    6				6				6			  6
-    [int  ushort]   [int  ushort]  [int  ushort]  [int  ushort]		1         25
-    
-    
-                                                                             
-    144  21   115
-    136  110  121
-    136  224  121                                                                         	
-    
-// 对于0字节数据加密
-0x00 0x50
-0x65 0x00
-0x00 0x00 
-
-	0x40 0x5c 0x00
-    
-最后一个字节（异或运算存储）
-p[6] ^ 
+```mermaid
+zenuml
+    title 加密过程
+    P->C: 对明文分组 WORD值
+    C->P: L x R 结果是一个字 DWORD  保留R
+    P->C: 循环对明文处理得到   DWORD,R 数据流 
+    P->C: 数据流⊕ s-box
 ```
 
-> 算法存在漏洞时，程序就可能出现漏洞。即bug既有既无，无法调试。
+> 解密过程
+>
+> 解密过程则是以3个字节为一个单位：  WORD  /  byte3   =  WORD
+>
+> WORD 字记作： W
+>
+> byte3 记作： S   (shadow)
+
+```mermaid
+zenuml2
+    title 解密过程
+    C->P: 数据流⊕ s-box 
+    C->P: W / S  求余后的值 和 S (等同于加密前的L,R)
+```
+
+> 异常情况:
+>
+> 由于除数不能为0，在加密时会判断 L,R是否为0， 有一个为0，不做处理。后续进入  ⊕  s-box阶段处理0字节数据
+>
+> 对于明文长度不足  WORD整数倍的， 最后一个字节同理不处理
 
 
 
-* 当相乘时 有可能产生，左或右值为0的情况，
+### 说明
+
+> 以上只是非常简单的实现，如何利用强大的数学公式和某些特殊的超越数 (无理数) 优化例如  AES CTR模式中  IV 自增形式的 one-time pad  作为学习吧。
+
+
+
+
+
+
 
 
 
