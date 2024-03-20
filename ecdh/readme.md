@@ -10,7 +10,7 @@
 #include <ecdh.h>
 #include <ecdh_model.h>
 #include <stdio.h>
-#include <mac.h>
+#include <mac.h>		// ps: mac.h是一些宏,不是hmac用于校验的
 
 #define KEYLEN 24
 
