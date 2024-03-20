@@ -18,5 +18,5 @@ static uint32_t prng_next(void);
 static void prng_init(uint32_t seed);
 
 
-bool random_bytes(void* addr, size_t len);
+bool random_bytes(void* addr, size_t len,uint32_t seed);
 void ecdh_demo(void);

@@ -14,15 +14,16 @@
 
 #define KEYLEN 24
 
-void* generate_pub(char *publickey) {
-	char privatekey[KEYLEN] = { 0 };
-	if (random_bytes(privatekey, KEYLEN)) {
-		hexdump("private key bytes", privatekey, KEYLEN);
-	}
-	ecdh_generate_keys(publickey, privatekey);
-	hexdump("publickey key bytes", publickey, 2 * KEYLEN);
+#define seed (0xbad ^ 0xc0ffee ^ 42) | 0xcafebabe | 676 ^ 0x32
+void* generate_pub(char* publickey) {
+    char privatekey[KEYLEN] = { 0 };
+    if (random_bytes(privatekey, KEYLEN, seed)) {
+        hexdump("private key bytes", privatekey, KEYLEN);
+    }
+    ecdh_generate_keys(publickey, privatekey);
+    hexdump("publickey key bytes", publickey, 2 * KEYLEN);
 
-	return privatekey;
+    return privatekey;
 }
 
 int main() {
