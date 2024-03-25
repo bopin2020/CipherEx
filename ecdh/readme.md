@@ -7,6 +7,7 @@
 > 新建一个工程项目  配置好include,lib目录
 
 ```c
+#include <Windows.h>
 #include <ecdh.h>
 #include <ecdh_model.h>
 #include <stdio.h>
@@ -14,12 +15,33 @@
 
 #define KEYLEN 24
 
-#define seed (0xbad ^ 0xc0ffee ^ 42) | 0xcafebabe | 676 ^ 0x32
+#define seed (0xbad ^ 0xc0ff4e ^ 12) | 0xcafebabe | 6244 ^ 0x32
 void* generate_pub(char* publickey) {
     char privatekey[KEYLEN] = { 0 };
+#ifdef PRNG
     if (random_bytes(privatekey, KEYLEN, seed)) {
+#else
+        // RtlGenRandom    systemfunction036 not found
+    if (random_bytes_ex(privatekey, KEYLEN)) {
+#endif
         hexdump("private key bytes", privatekey, KEYLEN);
     }
+    else
+    {
+        for (size_t i = 0; i < 100; i++)
+        {
+            /*
+            堆管理器分配内存  数据取决于参数配置 0表明使用堆管理器--内存管理器执行体负责数据
+            一小段时间内  分配多个内存块数据是相同的
+            */
+            char* tmp = (char*)LocalAlloc(0, KEYLEN);
+            memcpy(privatekey, tmp, KEYLEN);
+            LocalFree(tmp);
+            hexdump("private key bytes", privatekey, KEYLEN);
+        }
+
+    }
+
     ecdh_generate_keys(publickey, privatekey);
     hexdump("publickey key bytes", publickey, 2 * KEYLEN);
 
@@ -27,30 +49,30 @@ void* generate_pub(char* publickey) {
 }
 
 int main() {
-	//ecdh_demo();
+    //ecdh_demo();
 
     // 0. initialize  ECDH Library as like COM Init
-    if(ECDH_INIT()){
+    if (ECDH_INIT()) {
         return -1;
     }
-    
-    
-	// 1. 生成私钥
-	char publickey[2 * KEYLEN] = { 0 };
-	char *privatekey = generate_pub(publickey);
-
-	// 2. other publickey
-	char publickey_bob[2 * KEYLEN] = { 0 };
-	generate_pub(publickey_bob);
 
 
-	uint8_t share_key[2 * KEYLEN] = { 0 };
-	ecdh_shared_secret(privatekey, publickey_bob, share_key);
-	hexdump("shared key bytes", share_key, 2 * KEYLEN);
-    
+    // 1. 生成私钥
+    char publickey[2 * KEYLEN] = { 0 };
+    char* privatekey = generate_pub(publickey);
+
+    // 2. other publickey
+    char publickey_bob[2 * KEYLEN] = { 0 };
+    generate_pub(publickey_bob);
+
+
+    uint8_t share_key[2 * KEYLEN] = { 0 };
+    ecdh_shared_secret(privatekey, publickey_bob, share_key);
+    hexdump("shared key bytes", share_key, 2 * KEYLEN);
+
     // dont forget to uninit ECDH Library
-    
-    if(ECDH_UNINIT()){
+
+    if (ECDH_UNINIT()) {
         return -1;
     }
 }
