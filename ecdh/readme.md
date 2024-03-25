@@ -29,6 +29,12 @@ void* generate_pub(char* publickey) {
 int main() {
 	//ecdh_demo();
 
+    // 0. initialize  ECDH Library as like COM Init
+    if(ECDH_INIT()){
+        return -1;
+    }
+    
+    
 	// 1. 生成私钥
 	char publickey[2 * KEYLEN] = { 0 };
 	char *privatekey = generate_pub(publickey);
@@ -41,6 +47,12 @@ int main() {
 	uint8_t share_key[2 * KEYLEN] = { 0 };
 	ecdh_shared_secret(privatekey, publickey_bob, share_key);
 	hexdump("shared key bytes", share_key, 2 * KEYLEN);
+    
+    // dont forget to uninit ECDH Library
+    
+    if(ECDH_UNINIT()){
+        return -1;
+    }
 }
 ```
 

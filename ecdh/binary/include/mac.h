@@ -56,3 +56,20 @@ dump_data2(const void* s, size_t len, FILE* f);
 static const char* get_version();
 
 static CRITICAL_SECTION g_cst;
+
+typedef unsigned int ECDH_STATUS;
+
+#define ECDH_SUCCESS 0x0
+#define ECDH_FAILED 0x30001
+
+ECDH_STATUS
+ECDH_INIT();
+
+ECDH_STATUS
+ECDH_INIT2(void* param);
+
+ECDH_STATUS
+ECDH_UNINIT();
+
+ECDH_STATUS
+ECDH_UNINIT2(void* param);
