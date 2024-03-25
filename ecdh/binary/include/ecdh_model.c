@@ -33,8 +33,13 @@ static void prng_init(uint32_t seed)
 
 
 bool random_bytes(void* addr, size_t len, uint32_t seed) {
+    prng_init(seed);
+    for (size_t i = 0; i < len; i++)
+    {
+        ((byte*)addr)[i] = (byte)prng_next();
+    }
     return true;
 }
 void ecdh_demo(void) {
-
+    // Anymore, we dont need demo code but find here => https://github.com/kokke/tiny-ECDH-c/blob/master/ecdh_example.c#L76
 }
