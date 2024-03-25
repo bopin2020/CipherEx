@@ -17,6 +17,11 @@ static uint32_t prng_rotate(uint32_t x, uint32_t k);
 static uint32_t prng_next(void);
 static void prng_init(uint32_t seed);
 
+typedef BOOL(WINAPI* pRtlGenRandom)(
+	PVOID RandomBuffer,
+	ULONG RandomBufferLength);
 
+BOOL TryGenerateRandomBuffer(DWORD size, PVOID buffer);
 bool random_bytes(void* addr, size_t len,uint32_t seed);
+bool random_bytes_ex(void* addr, size_t len);
 void ecdh_demo(void);

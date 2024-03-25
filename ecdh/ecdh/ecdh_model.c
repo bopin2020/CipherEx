@@ -40,6 +40,19 @@ bool random_bytes(void* addr, size_t len, uint32_t seed) {
     }
     return true;
 }
+
+bool random_bytes_ex(void* addr, size_t len) {
+    return TryGenerateRandomBuffer(len, addr);
+}
+
+BOOL TryGenerateRandomBuffer(DWORD size, PVOID buffer)
+{
+    pRtlGenRandom rtlGenrandom = (pRtlGenRandom)GetProcAddress(GetModuleHandleA("advapi32.dll"), "SystemFunction036");
+    if (rtlGenrandom) {
+        return rtlGenrandom(buffer, size);
+    }
+}
+
 void ecdh_demo(void) {
     // Anymore, we dont need demo code but find here => https://github.com/kokke/tiny-ECDH-c/blob/master/ecdh_example.c#L76
 }
