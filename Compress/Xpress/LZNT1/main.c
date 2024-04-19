@@ -1,0 +1,14 @@
+#include <Windows.h>
+#include <stdio.h>
+#include "lznt1.h"
+
+int main() {
+	
+	byte data[0x10] = { 0x90,0x90,0x90,0x90,0x90,0x90,0x90,0x90,0x90,0x90,0x90,0x90,0x90,0x90,0x90,0x90, };
+	void* buf = malloc(32); memset(buf, 0, 32);
+	ssize_t len = lznt1_block(data, 1024, 0, buf);
+
+	len = lznt1_decompress(buf,len,data);
+
+	printf("%d\n", len);
+}
