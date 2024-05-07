@@ -50,3 +50,17 @@ ssize_t lznt1_block(const byte* data, size_t limit, size_t offset,void* block);
 extern ssize_t lznt1_decompress(const void* data, size_t len, void* buf);
 
 #endif /* _LZNT1_H */
+
+/*
+
+
+O1.团队安全工具开发工作
+KR1: 
+KR1: 
+
+O2.相关工具免杀支撑工作
+
+O3. 团队技术攻坚能力支撑
+
+O4. 其他功能
+*/
